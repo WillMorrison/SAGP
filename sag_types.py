@@ -26,7 +26,7 @@ class Column(object):
   def __mul__(self, other):
     return Column([a*b for a, b in zip(self.value, other.value)])
     
-  def __div__(self, other):
+  def __truediv__(self, other):
     return Column([a/b for a, b in zip(self.value, other.value)])
     
   def __neg__(self):

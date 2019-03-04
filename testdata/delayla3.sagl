@@ -1,0 +1,51 @@
+// Example DSL program for stacked area graphs
+// Based on StackedAreaGraphicExperiment-Delayla-3
+
+// These are the columns used from the raw RUTHEN table. 
+IMPORT COLUMNS BY Age EmployrPen OASBenefit OASBridging CPPBenefit CPPBridging TFSACD TFSACED RRSPCD RRSPCED FedIncTax PrvIncTax SalesTax Consumption;
+
+// Combine some variables for simplicity
+RRSPWithdrawals = RRSPCD + RRSPCED;
+TFSAWithdrawals = TFSACD + TFSACED;
+IncomeTaxes = FedIncTax + PrvIncTax;
+
+// Calculate effects of income tax
+FullyTaxable = EmployrPen + OASBenefit + OASBridging + CPPBenefit + CPPBridging + RRSPWithdrawals;
+AvgIncTaxRate = IncomeTaxes / FullyTaxable;
+PostIncTaxFraction = 1 - AvgIncTaxRate;
+
+PostIncTaxEmployrPen = EmployrPen * PostIncTaxFraction;
+PostIncTaxOASBenefit = OASBenefit * PostIncTaxFraction;
+PostIncTaxOASBridging = OASBridging * PostIncTaxFraction;
+PostIncTaxCPPBenefit = CPPBenefit * PostIncTaxFraction;
+PostIncTaxCPPBridging = CPPBridging * PostIncTaxFraction;
+PostIncTaxRRSPWithdrawals = RRSPWithdrawals * PostIncTaxFraction;
+
+// Calculate the effects of sales tax
+PostIncTaxTotal = PostIncTaxEmployrPen + PostIncTaxOASBenefit + PostIncTaxOASBridging + PostIncTaxCPPBenefit + PostIncTaxCPPBridging + PostIncTaxRRSPWithdrawals + TFSAWithdrawals;
+AvgSalesTaxRate = SalesTax / PostIncTaxTotal;
+PostSalesTaxFraction = 1 - AvgSalesTaxRate;
+
+PostSalesTaxEmployrPen = PostIncTaxEmployrPen * PostSalesTaxFraction;
+PostSalesTaxOASBenefit = PostIncTaxOASBenefit * PostSalesTaxFraction;
+PostSalesTaxOASBridging = PostIncTaxOASBridging * PostSalesTaxFraction;
+PostSalesTaxCPPBenefit = PostIncTaxCPPBenefit * PostSalesTaxFraction;
+PostSalesTaxCPPBridging = PostIncTaxCPPBridging * PostSalesTaxFraction;
+PostSalesTaxRRSPWithdrawals = PostIncTaxRRSPWithdrawals * PostSalesTaxFraction;
+PostSalesTaxTFSAWithdrawals = TFSAWithdrawals * PostSalesTaxFraction;
+
+// Create the consumption table
+DEFINE TABLE AfterTaxConsumption PostSalesTaxEmployrPen PostSalesTaxOASBenefit PostSalesTaxOASBridging PostSalesTaxCPPBenefit PostSalesTaxCPPBridging PostSalesTaxRRSPWithdrawals PostSalesTaxTFSAWithdrawals;
+DESCRIBE AfterTaxConsumption "Composition of constant dollar consumption";
+LIMIT AfterTaxConsumption BETWEEN 60 105;
+OUTPUT AfterTaxConsumption;
+
+// Create the inflows table
+DEFINE TABLE Inflows EmployrPen OASBenefit OASBridging CPPBenefit CPPBridging RRSPWithdrawals TFSAWithdrawals;
+DESCRIBE Inflows "Total real income sources";
+OUTPUT Inflows;
+
+// Create outflows table
+DEFINE TABLE Outflows Consumption SalesTax IncomeTaxes;
+DESCRIBE Outflows "Consumption = total inflows less income and sales taxes";
+OUTPUT Outflows;

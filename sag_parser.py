@@ -205,7 +205,8 @@ class SAGLParser(Parser):
       print("%s is not a table, cannot output" % p.NAME)
       return
     
-    print(str(table))
+    print(str(table), file=self.output_file)
+    # TODO Output legend after the table
 
 
 def Evaluate(program, input_table, output_file=None):
