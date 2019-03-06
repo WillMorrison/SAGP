@@ -38,10 +38,13 @@ class Column(object):
 
 class Table(object):
 
-  def __init__(self, columns, lower_bound=None, upper_bound=None, description=None):
+  def __init__(self, columns,
+               lower_bound=None, upper_bound=None, index_column=None,
+               description=None):
     self.columns = columns
     self.lower_bound = lower_bound
     self.upper_bound = upper_bound
+    self.index_column = index_column if index_column is not None else columns[0]
     self.description = description
     
   def __str__(self):
@@ -52,7 +55,8 @@ class Table(object):
     w = csv.writer(f)
     w.writerow([c.name for c in self.columns])
 
-    # TODO Filter by limits if present
-    for row in zip(*self.columns):
-      w.writerow(row)
+    for index, row in zip(self.index_column, zip(*self.columns)):
+      if ((self.lower_bound is None or index >= self.lower_bound)
+          and (self.upper_bound is None or index <= self.upper_bound)):
+        w.writerow(row)
     return f.getvalue()
