@@ -13,7 +13,7 @@ class SAGLLexer(Lexer):
     LPAREN, RPAREN,
     IMPORT, COLUMNS, BY,
     DESCRIBE,
-    DEFINE, TABLE,
+    DEFINE, TABLE, AS,
     LIMIT, BETWEEN,
     OUTPUT,
   }
@@ -47,6 +47,7 @@ class SAGLLexer(Lexer):
   NAME['DESCRIBE'] = DESCRIBE
   NAME['DEFINE'] = DEFINE 
   NAME['TABLE'] = TABLE
+  NAME['AS'] = AS
   NAME['LIMIT'] = LIMIT 
   NAME['BETWEEN'] = BETWEEN
   NAME['OUTPUT'] = OUTPUT
@@ -80,14 +81,19 @@ class SAGLParser(Parser):
   def __init__(self, input_table, output_file):
     super().__init__()
     self.names = {}  # for storing variables
-    self.column_len = None  # TODO initialize this from input_table
+    self.input_table = input_table
+    self.column_len = None
+    self.index_column = None
     self.output_file = output_file
     
   def import_table(self, column_names):
-    # This should be replaced by importing the data from input_table
-    self.column_len = 2
-    for name in column_names:
-      self.names[name] = Column([1., 2.], name=name, description='fake')
+    lower_column_names = set(n.lower() for n in column_names)
+    self.names = {col.name.lower(): col for col in self.input_table.columns
+                  if col.name.lower() in lower_column_names}
+    if lower_column_names != self.names.keys():
+      raise ValueError("Could not find all named columns in the input table")
+    self.index_column = self.names[column_names[0]]
+    self.column_len = len(self.index_column)
 
   precedence = (
     ('left','PLUS','MINUS'),
@@ -169,15 +175,14 @@ class SAGLParser(Parser):
     except LookupError:
       print("Undefined name '%s'" % p.NAME)
 
-  @_('DEFINE TABLE namelist')
+  @_('DEFINE TABLE NAME AS namelist')
   def define(self, p):
-    table_name = p.namelist[0]
     try:
       # TODO Check that all names refer to columns
-      columns = [self.names[column] for column in p.namelist[1:]]
-      self.names[table_name] = Table(columns)
+      columns = [self.names[column] for column in p.namelist]
+      self.names[p.NAME] = Table(columns)
     except LookupError:
-      print("Undefined column while defining table '%s'" % table_name)
+      print("Undefined column while defining table '%s'" % p.NAME)
 
   @_('LIMIT NAME BETWEEN NUMBER NUMBER')
   def limit(self, p):

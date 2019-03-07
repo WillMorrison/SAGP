@@ -1,6 +1,7 @@
 import argparse
 
 from sag_parser import Evaluate
+from table_parser import ParseCSVTable
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Evaluate a SAGL script on a RUTHEN table')
@@ -14,5 +15,6 @@ if __name__ == '__main__':
                     
   args = parser.parse_args()
   sagl = args.program.read()
+  table = ParseCSVTable(args.input_table.read())
 
-  Evaluate(sagl, input_table=args.input_table, output_file=args.output)
+  Evaluate(sagl, input_table=table, output_file=args.output)

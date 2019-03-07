@@ -33,7 +33,7 @@ class Column(object):
     return Column([-a for a in self.value], self.description)
     
   def __repr__(self):
-    return 'Column(%r, %r)' % (self.value, self.description)
+    return 'Column(%r, name=%r, description=%r)' % (self.value, self.name, self.description)
 
 
 class Table(object):
@@ -41,10 +41,15 @@ class Table(object):
   def __init__(self, columns,
                lower_bound=None, upper_bound=None, index_column=None,
                description=None):
-    self.columns = columns
+    self.columns = tuple(columns)
     self.lower_bound = lower_bound
     self.upper_bound = upper_bound
-    self.index_column = index_column if index_column is not None else columns[0]
+    if index_column is not None:
+      self.index_column = index_column
+    elif columns:
+      self.index_column = self.columns[0]
+    else:
+      raise ValueError("Table has no columns")
     self.description = description
     
   def __str__(self):

@@ -35,17 +35,17 @@ PostSalesTaxRRSPWithdrawals = PostIncTaxRRSPWithdrawals * PostSalesTaxFraction;
 PostSalesTaxTFSAWithdrawals = TFSAWithdrawals * PostSalesTaxFraction;
 
 // Create the consumption table
-DEFINE TABLE AfterTaxConsumption PostSalesTaxEmployrPen PostSalesTaxOASBenefit PostSalesTaxOASBridging PostSalesTaxCPPBenefit PostSalesTaxCPPBridging PostSalesTaxRRSPWithdrawals PostSalesTaxTFSAWithdrawals;
+DEFINE TABLE AfterTaxConsumption AS Age PostSalesTaxEmployrPen PostSalesTaxOASBenefit PostSalesTaxOASBridging PostSalesTaxCPPBenefit PostSalesTaxCPPBridging PostSalesTaxRRSPWithdrawals PostSalesTaxTFSAWithdrawals;
 DESCRIBE AfterTaxConsumption "Composition of constant dollar consumption";
 LIMIT AfterTaxConsumption BETWEEN 60 105;
 OUTPUT AfterTaxConsumption;
 
 // Create the inflows table
-DEFINE TABLE Inflows EmployrPen OASBenefit OASBridging CPPBenefit CPPBridging RRSPWithdrawals TFSAWithdrawals;
+DEFINE TABLE Inflows AS Age EmployrPen OASBenefit OASBridging CPPBenefit CPPBridging RRSPWithdrawals TFSAWithdrawals;
 DESCRIBE Inflows "Total real income sources";
 OUTPUT Inflows;
 
 // Create outflows table
-DEFINE TABLE Outflows Consumption SalesTax IncomeTaxes;
+DEFINE TABLE Outflows AS Age Consumption SalesTax IncomeTaxes;
 DESCRIBE Outflows "Consumption = total inflows less income and sales taxes";
 OUTPUT Outflows;
