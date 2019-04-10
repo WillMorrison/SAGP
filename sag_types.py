@@ -27,7 +27,7 @@ class Column(object):
     return Column([a*b for a, b in zip(self.value, other.value)])
     
   def __truediv__(self, other):
-    return Column([a/b for a, b in zip(self.value, other.value)])
+    return Column([a/b if b!=0 else float('nan') for a, b in zip(self.value, other.value)])
     
   def __neg__(self):
     return Column([-a for a in self.value], self.description)
