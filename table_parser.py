@@ -68,6 +68,9 @@ def ParseRuthenTable(table_str):
       else:
         description_lines.append(line)
         
+  if not table_begun:
+    raise ValueError("No BEGIN TABLE line found")
+
   return Table([Column([float(e.replace(',', '')) for e in col[1:]],
                         name = col[0], description='from RUTHEN')
                 for col in zip(*table_rows)],
