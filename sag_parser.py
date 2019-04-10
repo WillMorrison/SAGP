@@ -91,7 +91,8 @@ class SAGLParser(Parser):
     self.names = {col.name.lower(): col for col in self.input_table.columns
                   if col.name.lower() in lower_column_names}
     if lower_column_names != self.names.keys():
-      raise ValueError("Could not find all named columns in the input table")
+      raise ValueError("Could not find all named columns in the input table. Missing %s" % 
+                       ", ".join(lower_column_names-self.names.keys()))
     self.index_column = self.names[column_names[0]]
     self.column_len = len(self.index_column)
 
