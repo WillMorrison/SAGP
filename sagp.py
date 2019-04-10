@@ -1,7 +1,7 @@
 import argparse
 
 from sag_parser import Evaluate
-from table_parser import ParseCSVTable
+from table_parser import ParseCSVTable, ParseRuthenTable
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Evaluate a SAGL script on a RUTHEN table')
@@ -12,9 +12,15 @@ if __name__ == '__main__':
   parser.add_argument('--output', type=argparse.FileType('w'),
                     default=None,
                     help='The file path to output to')
+  parser.add_argument('--csv', type=bool,
+                    default=False,
+                    help='The file path to output to')
                     
   args = parser.parse_args()
   sagl = args.program.read()
-  table = ParseCSVTable(args.input_table.read())
+  if args.csv:
+    table = ParseCSVTable(args.input_table.read())
+  else:
+    table = ParseRuthenTable(args.input_table.read())
 
   Evaluate(sagl, input_table=table, output_file=args.output)
