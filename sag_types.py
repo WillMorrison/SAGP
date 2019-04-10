@@ -34,6 +34,11 @@ class Column(object):
     
   def __repr__(self):
     return 'Column(%r, name=%r, description=%r)' % (self.value, self.name, self.description)
+    
+  def __eq__(self, other):
+    return (self.value == other.value
+            and self.name == other.name
+            and self.description == other.description)
 
 
 class Table(object):
@@ -65,3 +70,8 @@ class Table(object):
           and (self.upper_bound is None or index <= self.upper_bound)):
         w.writerow(row)
     return f.getvalue()
+    
+  def __eq__(self, other):
+    return ((self.columns, self.index_column, self.description, self.lower_bound, self.upper_bound) ==
+            (other.columns, other.index_column, other.description, other.lower_bound, other.upper_bound))
+            
