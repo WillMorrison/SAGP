@@ -2,7 +2,20 @@
 // Based on StackedAreaGraphicExperiment-Delayla-3
 
 // These are the columns used from the raw RUTHEN table. 
-IMPORT COLUMNS BY Age EmployrPen OASBenefit OASBridging CPPBenefit CPPBridging TFSACD TFSACED RRSPCD RRSPCED FedIncTax PrvIncTax SalesTax Consumption;
+IMPORT COLUMNS BY Age EmplyrPension OASBenefit DOASBridging DCPPBenefit DCPPBridging DTFSACDWithD DTFSACEDWithD DRRSPCDWithD DRRSPCEDWithD DFedTxPayble DPrvTxPayble DSalesTxPaid DConsumption;
+
+// Alias some columns
+OASBridging = DOASBridging;
+CPPBenefit = DCPPBenefit;
+CPPBridging = DCPPBridging;
+TFSACD = DTFSACDWithD;
+TFSACED = DTFSACEDWithD;
+RRSPCD = DRRSPCDWithD;
+RRSPCED = DRRSPCEDWithD;
+FedIncTax = DFedTxPayble;
+PrvIncTax = DPrvTxPayble;
+SalesTax = DSalesTxPaid;
+Consumption = DConsumption;
 
 // Combine some variables for simplicity
 RRSPWithdrawals = RRSPCD + RRSPCED;
@@ -10,11 +23,11 @@ TFSAWithdrawals = TFSACD + TFSACED;
 IncomeTaxes = FedIncTax + PrvIncTax;
 
 // Calculate effects of income tax
-FullyTaxable = EmployrPen + OASBenefit + OASBridging + CPPBenefit + CPPBridging + RRSPWithdrawals;
+FullyTaxable = EmplyrPension + OASBenefit + OASBridging + CPPBenefit + CPPBridging + RRSPWithdrawals;
 AvgIncTaxRate = IncomeTaxes / FullyTaxable;
 PostIncTaxFraction = 1 - AvgIncTaxRate;
 
-PostIncTaxEmployrPen = EmployrPen * PostIncTaxFraction;
+PostIncTaxEmployrPen = EmplyrPension * PostIncTaxFraction;
 PostIncTaxOASBenefit = OASBenefit * PostIncTaxFraction;
 PostIncTaxOASBridging = OASBridging * PostIncTaxFraction;
 PostIncTaxCPPBenefit = CPPBenefit * PostIncTaxFraction;
@@ -41,7 +54,7 @@ LIMIT AfterTaxConsumption BETWEEN 60 105;
 OUTPUT AfterTaxConsumption;
 
 // Create the inflows table
-DEFINE TABLE Inflows AS Age EmployrPen OASBenefit OASBridging CPPBenefit CPPBridging RRSPWithdrawals TFSAWithdrawals;
+DEFINE TABLE Inflows AS Age EmplyrPension OASBenefit OASBridging CPPBenefit CPPBridging RRSPWithdrawals TFSAWithdrawals;
 DESCRIBE Inflows "Total real income sources";
 OUTPUT Inflows;
 
